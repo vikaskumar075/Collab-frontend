@@ -2,7 +2,7 @@ import { useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
-
+import { BASE_URL } from '../config';
 const Create = () => {
   const [title, setTitle] = useState('')
   const navigate = useNavigate()
@@ -14,7 +14,7 @@ const Create = () => {
     }
 
     try {
-      const res = await axios.post('https://collab-backend-self.vercel.app/api/doc/create', 
+      const res = await axios.post(`${BASE_URL}/api/doc/create`, 
         { title }, 
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       )

@@ -3,8 +3,13 @@ import { useParams } from 'react-router-dom'
 import io from 'socket.io-client'
 import axios from 'axios'
 import { toast } from 'react-toastify'
+import { BASE_URL } from '../config';
 
-const socket = io('https://collab-backend-self.vercel.app')
+const socket = io(BASE_URL, {
+  transports: ['websocket'],
+  withCredentials: true
+});
+
 
 const Editor = () => {
   const { id } = useParams()
@@ -16,7 +21,7 @@ const Editor = () => {
   useEffect(() => {
     const fetchDoc = async () => {
       try {
-        const res = await axios.get(`https://collab-backend-self.vercel.app/api/doc/${id}`, {
+        const res = await axios.get(`${BASE_URL}/api/doc/${id}`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         })
         setContent(res.data.content)
@@ -46,7 +51,7 @@ const Editor = () => {
 
   const save = async () => {
     try {
-      await axios.put(`https://collab-backend-self.vercel.app/api/doc/${id}`, { content }, {
+      await axios.put(`${BASE_URL}/api/doc/${id}`, { content }, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       })
       toast.success('Document saved!')
@@ -58,7 +63,7 @@ const Editor = () => {
 
   const openVersionModal = async () => {
     try {
-      const res = await axios.get(`https://collab-backend-self.vercel.app/api/doc/version/${id}`, {
+      const res = await axios.get(`${BASE_URL}/api/doc/version/${id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       })
       setVersions(res.data.reverse())
@@ -70,7 +75,7 @@ const Editor = () => {
 
   const restore = async (index) => {
     try {
-      const res = await axios.post(`https://collab-backend-self.vercel.app/api/doc/version/restore/${id}`, {
+      const res = await axios.post(`${BASE_URL}/api/doc/version/restore/${id}`, {
         index
       }, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }

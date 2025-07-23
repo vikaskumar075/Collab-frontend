@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { FaEnvelope, FaLock } from 'react-icons/fa'
-
+import { BASE_URL } from '../config';
 const Login = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -10,7 +10,7 @@ const Login = () => {
 
  const handleLogin = async () => {
   try {
-    const res = await axios.post('https://collab-backend-self.vercel.app/api/auth/login', {
+    const res = await axios.post(`${BASE_URL}/api/auth/login`, {
       email,
       password
     })

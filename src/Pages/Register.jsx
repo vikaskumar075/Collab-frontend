@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import { FaUser, FaEnvelope, FaLock } from 'react-icons/fa'
-
+import { BASE_URL } from '../config';
 const Register = () => {
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
@@ -14,7 +14,7 @@ const Register = () => {
 
 const handleRegister = async () => {
   try {
-    const res = await axios.post('https://collab-backend-self.vercel.app/api/auth/register', {
+    const res = await axios.post(`${BASE_URL}/api/auth/register`, {
       username,
       email,
       password
