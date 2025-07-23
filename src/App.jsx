@@ -9,8 +9,8 @@ import Editor from './Pages/Editor'
 const App = () => (
   <BrowserRouter>
     <Routes>
-      <Route path="/" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/" element={<Register />} />
       <Route path="/create" element={<Create />} />
       <Route path="/doc/:id" element={<Editor />} />
     </Routes>
