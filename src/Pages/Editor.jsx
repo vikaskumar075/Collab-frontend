@@ -2,13 +2,15 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import io from 'socket.io-client'
 import axios from 'axios'
+import { toast } from 'react-toastify'
 
 const socket = io('http://localhost:5000')
 
 const Editor = () => {
   const { id } = useParams()
   const [content, setContent] = useState('')
-  const [showModal, setShowModal] = useState(false)
+  const [showVersionModal, setShowVersionModal] = useState(false)
+  const [showShareModal, setShowShareModal] = useState(false)
   const [versions, setVersions] = useState([])
 
   useEffect(() => {
@@ -47,9 +49,10 @@ const Editor = () => {
       await axios.put(`http://localhost:5000/api/doc/${id}`, { content }, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       })
-      alert('Document saved!')
+      toast.success('Document saved!')
     } catch (err) {
       console.error('Error saving:', err)
+      toast.error(err)
     }
   }
 
@@ -58,8 +61,8 @@ const Editor = () => {
       const res = await axios.get(`http://localhost:5000/api/doc/version/${id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       })
-      setVersions(res.data.reverse()) 
-      setShowModal(true)
+      setVersions(res.data.reverse())
+      setShowVersionModal(true)
     } catch (err) {
       console.error('Error fetching versions:', err)
     }
@@ -73,11 +76,18 @@ const Editor = () => {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       })
       setContent(res.data.content)
-      setShowModal(false)
+      setShowVersionModal(false)
       alert('Version restored successfully!')
     } catch (err) {
       console.error('Error restoring version:', err)
     }
+  }
+
+  const shareLink = `${window.location.origin}/doc/${id}`
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(shareLink)
+    alert('Link copied to clipboard!')
   }
 
   return (
@@ -87,7 +97,7 @@ const Editor = () => {
         onChange={handleChange}
         className="w-full h-96 border p-4 text-base rounded"
       />
-      <div className="mt-4 flex gap-4">
+      <div className="mt-4 flex gap-4 flex-wrap">
         <button
           onClick={save}
           className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
@@ -100,14 +110,20 @@ const Editor = () => {
         >
           View Versions
         </button>
+        <button
+          onClick={() => setShowShareModal(true)}
+          className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
+        >
+          Share
+        </button>
       </div>
 
-      {/* Version Modal */}
-      {showModal && (
+
+      {showVersionModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white w-[90%] max-w-2xl p-6 rounded shadow-lg relative max-h-[90vh] overflow-y-auto">
             <button
-              onClick={() => setShowModal(false)}
+              onClick={() => setShowVersionModal(false)}
               className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-xl font-bold"
             >
               &times;
@@ -133,6 +149,30 @@ const Editor = () => {
                 </li>
               ))}
             </ul>
+          </div>
+        </div>
+      )}
+
+  
+      {showShareModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white w-full max-w-md p-6 rounded shadow-lg relative">
+            <button
+              onClick={() => setShowShareModal(false)}
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-xl font-bold"
+            >
+              &times;
+            </button>
+            <h2 className="text-lg font-semibold mb-4">Share Document</h2>
+            <div className="bg-gray-100 p-3 rounded flex items-center justify-between">
+              <span className="break-all">{shareLink}</span>
+              <button
+                onClick={copyToClipboard}
+                className="bg-purple-600 text-white text-sm px-3 py-1 rounded ml-2 hover:bg-purple-700"
+              >
+                Copy
+              </button>
+            </div>
           </div>
         </div>
       )}

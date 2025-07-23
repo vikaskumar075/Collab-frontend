@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import axios from 'axios';
 import useAuth from '../hooks/useAuth';
+import { toast } from 'react-toastify';
 
 const DocumentPage = () => {
   const { id } = useParams();
@@ -55,10 +56,19 @@ const DocumentPage = () => {
     try {
       await axios.put(`/api/docs/${id}`, { content });
       setIsSaving(false);
+      toast.success("Document saved!");
     } catch (err) {
       console.error('Failed to save document:', err);
       setIsSaving(false);
+      toast.error("Failed to save!");
     }
+  };
+
+  const handleShare = () => {
+    const shareLink = window.location.href;
+    navigator.clipboard.writeText(shareLink)
+      .then(() => toast.success("Link copied to clipboard!"))
+      .catch(() => toast.error("Failed to copy link!"));
   };
 
   if (!document) {
@@ -92,17 +102,23 @@ const DocumentPage = () => {
       </div>
 
       {document.versions?.length > 0 && (
-        <div className="mt-8">
-          <h2 className="text-xl font-semibold mb-4">Version History</h2>
-          <div className="space-y-2">
-            {document.versions.slice(0, 5).map((version, index) => (
-              <div key={index} className="bg-gray-50 p-3 rounded-md">
-                <p className="text-sm text-gray-500">
-                  Saved on: {new Date(version.savedAt).toLocaleString()}
-                </p>
-              </div>
-            ))}
+        <div className="mt-10">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-medium text-gray-700">Version History</h2>
+            <button
+              onClick={handleShare}
+              className="px-4 py-2 rounded-md bg-green-500 text-black hover:bg-green-600 transition text-sm"
+            >
+              Share
+            </button>
           </div>
+          <ul className="space-y-2">
+            {document.versions.slice(0, 5).map((version, index) => (
+              <li key={index} className="bg-gray-50 p-3 rounded-md border text-sm text-gray-600">
+                Saved on: {new Date(version.savedAt).toLocaleString()}
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </div>
