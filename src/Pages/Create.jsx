@@ -14,7 +14,7 @@ const Create = () => {
     }
 
     try {
-      const res = await axios.post('http://localhost:5000/api/doc/create', 
+      const res = await axios.post('https://collab-backend-self.vercel.app/api/doc/create', 
         { title }, 
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       )
